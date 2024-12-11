@@ -23,7 +23,7 @@ The GDPR RAG Helper is an AI-powered tool designed to simplify and demystify the
    - Text chunks are converted into vector embeddings using state-of-the-art models like OpenAI's `text-embedding-ada-002`.
 
 3. **Vector Database:**
-   - A vector store (e.g., FAISS or Pinecone) is used to store embeddings for efficient retrieval.
+   - The embeddings are stored in PostgreSQL with the `pg_vector` extension for efficient similarity search.
 
 4. **Retrieval-Augmented Generation:**
    - User queries are processed to:
@@ -40,9 +40,9 @@ The GDPR RAG Helper is an AI-powered tool designed to simplify and demystify the
 - **Programming Language:** Python
 - **Libraries & Frameworks:**
   - **NLP:** OpenAI API, Hugging Face Transformers
-  - **Vector Search:** FAISS, Pinecone
+  - **Vector Search:** PostgreSQL with `pg_vector`
   - **UI:** Streamlit or Flask
-- **Deployment:** Streamlit Cloud, Docker, AWS/GCP
+- **Deployment:** Docker, Streamlit Cloud, AWS/GCP
 - **Other Tools:** LangChain, LlamaIndex for pipeline integration
 
 ---
@@ -51,10 +51,12 @@ The GDPR RAG Helper is an AI-powered tool designed to simplify and demystify the
 
 ### Prerequisites
 - Python 3.8+
+- Docker and Docker Compose
 - OpenAI API key (if using OpenAI for embeddings and generation)
-- FAISS or Pinecone for vector storage
+- PostgreSQL with `pg_vector` extension enabled
 
 ### Installation
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/gdpr-rag-helper.git
