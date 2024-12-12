@@ -5,35 +5,42 @@
 ```
 GDPR-RAG-Helper/
 ├── data/
-│   ├── gdpr_full_text.txt       # Raw GDPR text
-│   └── preprocessed_chunks.json # Preprocessed text chunks
+│   ├── gdpr_full_text.txt          # Raw GDPR text (generated from PDF)
+│   ├── preprocessed_chunks.json    # Preprocessed text chunks
+│   └── versions/                   # Folder to store different versions of GDPR text
+│       ├── gdpr_2024_12_12.txt     # Example versioned GDPR text file
 ├── embeddings/
-│   └── gdpr_embeddings.pkl      # Stored vector embeddings
+│   └── gdpr_embeddings.pkl         # Stored vector embeddings
 ├── src/
 │   ├── app/
-│   │   ├── __init__.py          # Initialization for the app module
-│   │   ├── main.py              # Main application logic (UI)
-│   │   └── utils.py             # Utility functions
+│   │   ├── __init__.py             # Initialization for the app module
+│   │   ├── main.py                 # Main application logic (UI)
+│   │   └── utils.py                # Utility functions
 │   ├── nlp/
-│   │   ├── __init__.py          # Initialization for the NLP module
-│   │   ├── embedding.py         # Embedding generation logic
-│   │   ├── retrieval.py         # Retrieval logic
-│   │   └── summarization.py     # Summarization logic
+│   │   ├── __init__.py             # Initialization for the NLP module
+│   │   ├── embedding.py            # Embedding generation logic
+│   │   ├── retrieval.py            # Retrieval logic
+│   │   └── summarization.py        # Summarization logic
+│   ├── pdf/
+│   │   ├── __init__.py             # Initialization for the PDF module
+│   │   ├── extract_text.py         # Script to extract text from GDPR PDF
+│   │   └── version_manager.py      # Script to manage versions of GDPR text
 │   ├── db/
-│   │   ├── __init__.py          # Initialization for the database module
-│   │   ├── setup.py             # Database setup script
-│   │   └── queries.py           # Database query logic
+│   │   ├── __init__.py             # Initialization for the database module
+│   │   ├── setup.py                # Database setup script
+│   │   └── queries.py              # Database query logic
 │   └── tests/
-│       ├── test_embeddings.py   # Unit tests for embedding logic
-│       ├── test_retrieval.py    # Unit tests for retrieval logic
-│       ├── test_ui.py           # Unit tests for UI
-│       └── test_pipeline.py     # End-to-end tests for the pipeline
+│       ├── test_embeddings.py      # Unit tests for embedding logic
+│       ├── test_retrieval.py       # Unit tests for retrieval logic
+│       ├── test_ui.py              # Unit tests for UI
+│       ├── test_pdf_extraction.py  # Unit tests for PDF text extraction
+│       └── test_pipeline.py        # End-to-end tests for the pipeline
 ├── docker/
-│   ├── Dockerfile               # Docker configuration for deployment
-│   └── docker-compose.yml       # Docker Compose configuration
-├── requirements.txt             # Python dependencies
-├── README.md                    # Project documentation
-└── config.yml                   # Configuration settings
+│   ├── Dockerfile                  # Docker configuration for deployment
+│   └── docker-compose.yml          # Docker Compose configuration
+├── requirements.txt                # Python dependencies
+├── README.md                       # Project documentation
+└── config.yml                      # Configuration settings
 ```
 
 ---
