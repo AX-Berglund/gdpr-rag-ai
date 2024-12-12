@@ -178,7 +178,13 @@ GDPR-RAG-Helper/
    Use logging and monitoring tools to track query response times and errors.
 
 2. **Update Content**:
-   Regularly update embeddings and retrain as new GDPR guidelines or interpretations emerge.
+   Implement a periodic update mechanism:
+   - Schedule a process (e.g., a cron job or a scheduled Lambda function) to check for updates to the GDPR text from official sources.
+   - Re-run the preprocessing and embedding generation scripts whenever updates are detected.
+   - Notify users of changes by including a "last updated" timestamp in the UI.
+
+3. **Validate Updates**:
+   Before deploying updated embeddings, perform validation to ensure they align correctly with queries and retrieval logic.
 
 ---
 
