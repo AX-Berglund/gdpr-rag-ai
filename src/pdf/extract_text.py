@@ -101,18 +101,23 @@ def fix_lines_algorithm(file1, file2, file3, file4, output_file):
             updated_line = lines4[lines2_dict[line1]]
         else:  # Perform partial matches
             prefix_match = None
-            suffix_match = None
+            suffix_match3 = None
+            suffix_match2 = None
             for idx, line2 in enumerate(lines2):
                 if line1[3:] == line2:
-                    suffix_match = idx
+                    suffix_match3 = idx
+                elif line1[2:] == line2:
+                    suffix_match2 = idx
                 elif line1[:20] == line2[:20]:
                     prefix_match = idx
                 # Break early if both matches found
-                if suffix_match and prefix_match:
+                if suffix_match3 or suffix_match2 or prefix_match:
                     break
 
-            if suffix_match is not None:
-                updated_line = line1[:3] + "   " + lines4[suffix_match]
+            if suffix_match3 is not None:
+                updated_line = line1[:3] + "   " + lines4[suffix_match3]
+            elif suffix_match2 is not None:
+                updated_line = line1[:2] + "    " + lines4[suffix_match2]
             elif prefix_match is not None:
                 updated_line = lines4[prefix_match]
 
@@ -125,28 +130,84 @@ def fix_lines_algorithm(file1, file2, file3, file4, output_file):
     print(f"Successfully fixed lines and saved to: {output_file}")
 
 # Removes footnotes and headers from the dropped spaces text file
+# def remove_repeating_strings(input_file, output_file):
+#     """
+#     Removes all instances of the string pattern '4.5.2016L119/xOfficialJournaloftheEuropeanUnionEN'
+#     where 'x' iterates from 1 to 119, and replaces them with an empty string.
+#     Args:
+#         input_file (str): Path to the input .txt file.
+#         output_file (str): Path to save the modified .txt file.
+#     """
+#     # Regex pattern to match '4.5.2016L119/xOfficialJournaloftheEuropeanUnionEN' where x is 1-119
+#     pattern = re.compile(r"4\.5\.2016L119/\d{1,3}OfficialJournaloftheEuropeanUnionEN")
+    
+#     with open(input_file, "r", encoding="utf-8") as file:
+#         content = file.read()
+
+#     # Replace all matches with an empty string
+#     modified_content = re.sub(pattern, "", content)
+
+#     # Write the modified content to the output file
+#     with open(output_file, "w", encoding="utf-8") as file:
+#         file.write(modified_content)
+    
+#     print(f"All matching patterns removed. Output saved to {output_file}")
+
 def remove_repeating_strings(input_file, output_file):
     """
     Removes all instances of the string pattern '4.5.2016L119/xOfficialJournaloftheEuropeanUnionEN'
-    where 'x' iterates from 1 to 119, and replaces them with an empty string.
+    where 'x' iterates from 1 to 119. If the pattern is followed by 'Article', replaces the pattern with '\n';
+    otherwise, replaces it with an empty string.
+
     Args:
         input_file (str): Path to the input .txt file.
         output_file (str): Path to save the modified .txt file.
     """
     # Regex pattern to match '4.5.2016L119/xOfficialJournaloftheEuropeanUnionEN' where x is 1-119
     pattern = re.compile(r"4\.5\.2016L119/\d{1,3}OfficialJournaloftheEuropeanUnionEN")
-    
+
     with open(input_file, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # Replace all matches with an empty string
-    modified_content = re.sub(pattern, "", content)
+    # Function to check if the pattern is followed by 'Article'
+    def replacement_logic(match):
+        following_text = content[match.end():].lstrip()
+        if following_text.startswith('Article'):
+            return '\n'
+        return ''
+
+    # Replace patterns using the logic
+    modified_content = re.sub(pattern, replacement_logic, content)
 
     # Write the modified content to the output file
     with open(output_file, "w", encoding="utf-8") as file:
         file.write(modified_content)
-    
-    print(f"All matching patterns removed. Output saved to {output_file}")
+
+    print(f"All matching patterns processed. Output saved to {output_file}")
+
+# TODO: There is something wrong with this function, you must run it twice for it to work. Note that we must run main() and not subrun()
+def manual_fix_article_80(input_file, output_file):
+    """
+    Splits 'Article 80 ' onto its own line, but leaves 'Article 80,' or other punctuated cases unchanged.
+    """
+    with open(input_file, "r", encoding="utf-8") as file:
+        content = file.readlines()
+
+    modified_content = []
+    for line in content:
+        # Check for 'Article 80 ' specifically, excluding cases like 'Article 80,'
+        if 'Article 80 ' in line and not 'Article 80,' in line:
+            parts = line.split('Article 80 ', 1)  # Split into parts before and after 'Article 80 '
+            modified_content.append(parts[0].rstrip() + '\n')  # Content before 'Article 80'
+            modified_content.append('Article 80\n')  # 'Article 80' on a new line
+            modified_content.append(parts[1])  # Remaining content after 'Article 80'
+        else:
+            modified_content.append(line)  # Leave other lines unchanged
+
+    with open(output_file, "w", encoding="utf-8") as file:
+        file.writelines(modified_content)
+
+
 
 
 
@@ -227,6 +288,9 @@ def preprocess_raw_textfiles(pypdf2_text_path, pdfminer_text_path):
     pypdf2_spaceDrop_cleaned = "../../data/text/pypdf2_dropped_spaces_cleaned.txt"
     remove_repeating_strings(pypdf2_spaceDrop, pypdf2_spaceDrop_cleaned)
 
+    # fix line article 80
+    manual_fix_article_80(pypdf2_spaceDrop_cleaned, pypdf2_spaceDrop_cleaned)
+    manual_fix_article_80(pypdf2_text_path, pypdf2_text_path)
     # Step 4: Fix line inconsistencies and combine cleaned outputs
     # This function combines the best from both PyPDF2 and PDFMiner extracts
     # Combine layout from PyPDF2 and language from PDFMiner
@@ -259,9 +323,19 @@ def main():
     split_output_dir = '../../data/text/split_articles'
     split_txt_by_articles(txt_path, split_output_dir)
 
+def sub_run():
+    txt1_path = "../../data/text/pypdf2.txt"
+    txt2_path = "../../data/text/pdfminer.txt"
 
+    # Step 2: Preprocess the extracted text files
+    txt_path = preprocess_raw_textfiles(txt1_path, txt2_path) # see file "gdpr_2016.txt"
+
+    # Step 5: Split the final cleaned text into articles files
+    split_output_dir = '../../data/text/split_articles'
+    split_txt_by_articles(txt_path, split_output_dir)
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    sub_run()
 
